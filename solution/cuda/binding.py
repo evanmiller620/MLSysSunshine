@@ -12,7 +12,7 @@ from tvm.ffi import register_func
 
 
 @register_func("flashinfer.kernel")
-def kernel():
+def kernel(a_tvm, b_tvm, n):
     """
     Python binding for your CUDA kernel.
 
@@ -22,4 +22,11 @@ def kernel():
     2. Launch your CUDA kernel with appropriate grid/block dimensions
     3. Return outputs as specified by the track definition
     """
-    pass
+    def get_ptr(tvm_tensor):
+        return ctypes.cast(tvm_tensor.data, ctypes.c_void_p)
+
+    lib.flashinfer_entry(
+        get_ptr(a_tvm), 
+        get_ptr(b_tvm), 
+        get_ptr(output_tvm)
+    )
